@@ -1,4 +1,4 @@
-const { User } = require('../model/User');
+const User = require('../model/User');
 const { UserPassword } = require('../model/UserPassword');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
@@ -6,7 +6,7 @@ const sequelize = require('../config/database').getSequelize();
 const userRepository = require('../repository/userRepository');
 const userService = require('../service/userService');
 
-// CREATE
+/*// CREATE
 const createUser = async (req, res) => {
     try {
         const userData = req.body;
@@ -22,7 +22,7 @@ const createUser = async (req, res) => {
             error: error.message
         });
     }
-};
+};*/
 
 //READALL
 const readAll = async (req,res) => {
@@ -56,9 +56,6 @@ const readById = async (req, res) => {
     }
 };
 
-export { readAll, readById };
-
-
 module.exports = {
-    createUser,
-    readAll,};
+    readAll,
+    readById};
