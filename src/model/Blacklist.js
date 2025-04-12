@@ -10,11 +10,13 @@ const Blacklist = sequelize.define('Blacklist', {
     },
     userId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        field: 'userid'
     },
     createdDate: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
+        field: 'createddate'
     },
 },{
     tableName: 'blacklist',

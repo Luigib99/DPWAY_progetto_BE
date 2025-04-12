@@ -11,7 +11,6 @@ const app = express();
 
 // MIDDLEWARE
 app.use(cors());
-app.use(bodyParser.json());
 app.use(express.json());
 
 // ROUTE

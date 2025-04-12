@@ -1,28 +1,10 @@
 const User = require('../model/User');
-const { UserPassword } = require('../model/UserPassword');
+const UserPassword = require('../model/UserPassword');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const sequelize = require('../config/database').getSequelize();
 const userRepository = require('../repository/userRepository');
 const userService = require('../service/userService');
-
-/*// CREATE
-const createUser = async (req, res) => {
-    try {
-        const userData = req.body;
-        const newUser = await userService.createUser(userData);
-        res.status(201).json({
-            message: 'Utente creato con successo',
-            user: newUser
-        });
-    } catch (error) {
-        console.error('Errore nella creazione dell\'utente:', error);
-        res.status(400).json({
-            message: 'Errore nella creazione dell\'utente',
-            error: error.message
-        });
-    }
-};*/
 
 //READALL
 const readAll = async (req,res) => {
@@ -45,7 +27,7 @@ const readAll = async (req,res) => {
 const readById = async (req, res) => {
     const { id } = req.params;
     try {
-        const user = await User.findByPk(id);
+        const user = await userService.readById(id);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -56,6 +38,26 @@ const readById = async (req, res) => {
     }
 };
 
+//CREATE
+const createUser = async (req, res) => {
+    try {
+        const body = req.body;
+        const newUser = await userService.createUser(body);
+        res.status(201).json({
+            message: 'Utente creato con successo',
+            user: newUser
+        });
+    } catch (error) {
+        console.error('Errore nella creazione dell\'utente:', error);
+        res.status(400).json({
+            message: 'Errore nella creazione dell\'utente',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
+    createUser,
     readAll,
-    readById};
+    readById
+};

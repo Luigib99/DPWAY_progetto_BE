@@ -10,15 +10,18 @@ const UserRole = sequelize.define('UserRole', {
     },
     userId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        field: 'userid'
     },
     roleId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        field: 'roleid'
     },
     createdDate: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        field: 'createddate'
     }
 }, {
     tableName: 'user_role',

@@ -18,6 +18,7 @@ const Role = sequelize.define('Roles', {
     createdDate: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
+        field: 'createddate'
     },
 },{
     tableName: 'roles',

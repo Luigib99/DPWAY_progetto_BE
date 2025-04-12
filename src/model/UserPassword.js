@@ -10,7 +10,8 @@ const UserPassword = sequelize.define('UserPassword', {
     },
     userId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        field: 'userid'
     },
     password: {
         type: DataTypes.STRING(255),
@@ -18,7 +19,8 @@ const UserPassword = sequelize.define('UserPassword', {
     },
     createdDate: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        defaultValue: DataTypes.NOW,
+        field: 'createddate'
     }
 }, {
     tableName: 'user_password',

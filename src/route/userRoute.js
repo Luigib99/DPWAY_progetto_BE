@@ -8,4 +8,7 @@ router.get('/readAll', userController.readAll);
 // READ BY ID
 router.get('/read/:id', userController.readById);
 
+//CREATE
+router.post('/create', userController.createUser);
+
 module.exports = router;
