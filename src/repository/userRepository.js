@@ -1,10 +1,17 @@
 const  User  = require('../model/User');
+const Role = require ('../model/Role')
 const UserPassword = require('../model/UserPassword');
 const UserRole = require('../model/UserRole');
 
 //READ ALL
 const readAll = async () => {
-    return await User.findAll();
+    return await User.findAll({
+        include: {
+            model: Role,
+            attributes: ['name'],
+            through: { attributes: [] },
+        },
+    });
 };
 
 //READ BY ID
@@ -15,6 +22,15 @@ const readById = async (id) => {
 //CREATE
 const createUser = async (userData, transaction) => {
     return await User.create(userData, { transaction });
+};
+
+//UPDATE
+const updateUser = async (id, data) => {
+    await User.update(data, { where: { id } });
+};
+
+const findById = async (id) => {
+    return await User.findByPk(id);
 };
 
 const createUserPassword = async (userId, password, transaction) => {
@@ -48,5 +64,7 @@ module.exports = {
     createUserPassword,
     createUserRole,
     findUserByUsername,
-    findUserByEmail
+    findUserByEmail,
+    updateUser,
+    findById
 };

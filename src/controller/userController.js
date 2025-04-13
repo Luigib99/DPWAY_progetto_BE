@@ -23,7 +23,7 @@ const readAll = async (req,res) => {
     }
 }
 
-//READBYID
+//READ BY ID
 const readById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -56,8 +56,48 @@ const createUser = async (req, res) => {
     }
 };
 
+//UPDATE
+const updateUser = async (req,res) =>{
+    const { id } = req.params;
+    try{
+        const body = req.body;
+        const modifiedUser = await userService.updateUser(body, id);
+        res.status(201).json({
+            message: 'Utente modificato con successo',
+            user: modifiedUser
+        });
+    }
+    catch (error){
+        console.error('Errore nella modifica dell\'utente', error);
+        res.status(400).json({
+            message: 'Errore nella modifica dell\'utente',
+            error: error.message
+        })
+    }
+}
+
+//DELETE
+/*const deleteUser = async (req,res)=>{
+    const { id } = req.params;
+    try{
+        const deletedUser = await userService.deleteUser;
+        res.status(200).json({
+            message: 'Utente eliminato con successo',
+            user: deletedUser
+        });
+    } catch (error){
+        console.error('Errore nell\'eliminazione dell\'utente', error);
+        res.status(400).json({
+            message: 'Errore nell\'eliminazione dell\'utente',
+            error: error.message
+        })
+    }
+}*/
+
 module.exports = {
     createUser,
     readAll,
-    readById
+    readById,
+    updateUser,
+    /*deleteUser*/
 };
