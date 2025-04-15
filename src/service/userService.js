@@ -1,18 +1,31 @@
 const userRepository = require('../repository/userRepository');
-const User = require('../model/User')
-const UserRole = require('../model/UserRole')
-const UserPassword = require('../model/UserPassword');
+const roleRepository = require('../repository/roleRepository');
+const utilsRepository = require('../repository/utilsRepository');
+const passwordRepository = require('../repository/passwordRepository')
+const userConverter = require('../utils/userConverter')
+const UserDTO = require('../dto/UserDTO');
 const bcrypt = require('bcryptjs');
 const sequelize = require('../config/database').getSequelize();
 
 //READ ALL
-const readAll = async ()=> {
-    return await userRepository.readAll();
-}
+const readAll = async () => {
+    const users = await userRepository.readAll();
+    const usersDTO = [];
+
+    for (const user of users) {
+        usersDTO.push(userConverter.modelToDTO(user));
+    }
+    return usersDTO;
+};
 
 //READ BY ID
 const readById = async (id)=> {
-    return await userRepository.readById(id);
+    const user = await userRepository.readById(id);
+    if (!user) {
+        throw new Error('Utente non trovato');
+    }
+    const userDTO = userConverter.modelToDTO(user)
+    return userDTO;
 }
 
 //CREATE
@@ -30,11 +43,12 @@ const createUser = async (body) => {
             active: true
         }, transaction);
 
-        await userRepository.createUserPassword(user.id, hashedPassword, transaction);
-        await userRepository.createUserRole(user.id, body.roleId || 1, transaction);
+        await passwordRepository.createUserPassword(user.id, hashedPassword, transaction);
+        await roleRepository.createUserRole(user.id, body.roleId || 1, transaction);
 
         await transaction.commit();
-        return user;
+        const userDTO = userConverter.modelToDTO(user)
+        return userDTO;
     } catch (error) {
         await transaction.rollback();
         throw error;
@@ -43,7 +57,7 @@ const createUser = async (body) => {
 
 //UPDATE
 const updateUser = async (body, id) => {
-    const userModified = await userRepository.findById(id);
+    const userModified = await utilsRepository.findById(id);
     if (!userModified) throw new Error('Utente non trovato.');
     const currentEmail = userModified.email;
     const currentUsername = userModified.username;
@@ -56,42 +70,106 @@ const updateUser = async (body, id) => {
     }
 
     await userRepository.updateUser(id, body);
-    return await userRepository.findById(id);
+    const userSaved =  userRepository.readById(id)
+    const userSavedDTO = userConverter.modelToDTO(userSaved)
+    return await userSavedDTO;
+};
+//UPDATE USERNAME
+const updateUsername = async (body, id) => {
+    const userModified = await utilsRepository.findById(id);
+    if (!userModified) throw new Error('Utente non trovato.');
+    const currentUsername = userModified.username;
+
+    await verifyUser(body, id, currentUsername);
+    await userRepository.updateUsername(id, body);
+    const userSaved = await  userRepository.readById(id)
+    const userSavedDTO = userConverter.modelToDTO(userSaved)
+    return await userSavedDTO;
+};
+//UPDATE EMAIL
+const updateEmail = async (body, id) => {
+    const userModified = await utilsRepository.findById(id);
+    if (!userModified) throw new Error('Utente non trovato.');
+    const currentEmail = userModified.email;
+
+    await verifyUser(body, id, currentEmail);
+
+    await userRepository.updateEmail(id, body);
+    const userSaved =  await userRepository.readById(id)
+    const userSavedDTO = userConverter.modelToDTO(userSaved)
+    return await userSavedDTO;
+};
+//UPDATE PASSWORD
+const updatePassword = async (body, id) => {
+    await verifyUser(body, id);
+
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+    const transaction = await sequelize.transaction();
+
+    try {
+        const user = await utilsRepository.findById(id);
+        if (!user) throw new Error('Utente non trovato');
+
+        await passwordRepository.createUserPassword(user.id, hashedPassword, transaction);
+        await transaction.commit();
+
+        return user;
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
 };
 
-//VALIDAZIONE
-const verifyUser = async (body, id = null, currentUsername = null, currentEmail = null, currentPassword=null) => {
+//DELETE
+const deleteUser = async (id)=>{
+    const userDeleted = await userRepository.readById(id)
+    const userDeletedDTO = userConverter.modelToDTO(userDeleted)
+    await userRepository.deleteUser(id);
+    return userDeletedDTO;
+}
+
+//VERIFICA L'UTENTE
+const verifyUser = async (body, id = null, currentUsername = null, currentEmail = null, currentPassword = null) => {
     const usernameRegex = /^[a-zA-Z0-9._]{4,20}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    //CONTROLLO SE RISPETTANO LE REGOLE
-    if (!body.username || !usernameRegex.test(body.username)) {
-        throw new Error('Username non valido');
+    // USERNAME
+    if (body.username !== undefined) {
+        if (!usernameRegex.test(body.username)) {
+            throw new Error('Username non valido');
+        }
+
+        if (body.username !== currentUsername) {
+            const existingUsername = await utilsRepository.findUserByUsername(body.username);
+            if (existingUsername) throw new Error('Username già in uso');
+        }
     }
 
-    if (!body.email || !emailRegex.test(body.email)) {
-        throw new Error('Email non valida');
+    // EMAIL
+    if (body.email !== undefined) {
+        if (!emailRegex.test(body.email)) {
+            throw new Error('Email non valida');
+        }
+
+        if (body.email !== currentEmail) {
+            const existingEmail = await utilsRepository.findUserByEmail(body.email);
+            if (existingEmail) throw new Error('Email già in uso');
+        }
     }
 
-    if (!body.password || body.password.length < 6) {
-        throw new Error('Password troppo corta');
-    }
+    // PASSWORD
+    if (body.password !== undefined) {
+        if (body.password.length < 6) {
+            throw new Error('Password troppo corta');
+        }
 
-    // CONTROLLO SE SI RIPETONO
-    if (body.username !== currentUsername) {
-        const existingUsername = await userRepository.findUserByUsername(body.username);
-        if (existingUsername) throw new Error('Username già in uso');
-    }
-
-    if (body.email !== currentEmail) {
-        const existingEmail = await userRepository.findUserByEmail(body.email);
-        if (existingEmail) throw new Error('Email già in uso');
-    }
-
-    if (body.password === currentPassword) {
-       throw new Error('Stai usando la stessa password');
+        if (body.password === currentPassword) {
+            throw new Error('Stai usando la stessa password');
+        }
     }
 };
+
+
 
 
 
@@ -100,5 +178,9 @@ module.exports = {
     readAll,
     createUser,
     updateUser,
-    verifyUser,
+    updateUsername,
+    updateEmail,
+    updatePassword,
+    deleteUser,
+    verifyUser
 };

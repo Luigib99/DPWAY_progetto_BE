@@ -1,16 +1,16 @@
 const  User  = require('../model/User');
 const Role = require ('../model/Role')
-const UserPassword = require('../model/UserPassword');
-const UserRole = require('../model/UserRole');
 
 //READ ALL
 const readAll = async () => {
     return await User.findAll({
-        include: {
-            model: Role,
-            attributes: ['name'],
-            through: { attributes: [] },
-        },
+        include: [
+            {
+                model: Role,
+                as: 'Roles',
+                attributes: ['id', 'name']
+            }
+        ]
     });
 };
 
@@ -29,42 +29,35 @@ const updateUser = async (id, data) => {
     await User.update(data, { where: { id } });
 };
 
-const findById = async (id) => {
-    return await User.findByPk(id);
+//UPDATE USERNAME
+const updateUsername = async (id, data) => {
+    await User.update(data, { where: { id } });
 };
 
-const createUserPassword = async (userId, password, transaction) => {
-    return await UserPassword.create({
-        userId,
-        password,
-        createdDate: new Date()
-    }, { transaction });
+//UPDATE EMAIL
+const updateEmail = async (id, data) => {
+    await User.update(data, { where: { id } });
 };
 
-const createUserRole = async (userId, roleId, transaction) => {
-    return await UserRole.create({
-        userId,
-        roleId,
-        createdDate: new Date()
-    }, { transaction });
+//UPDATE PASSWORD
+const updatePassword = async (id, data) => {
+    await User.update(data, { where: { id } });
 };
 
-const findUserByUsername = async (username) => {
-    return await User.findOne({ where: { username } });
-};
-
-const findUserByEmail = async (email) => {
-    return await User.findOne({ where: { email } });
-};
+//DELETE
+async function deleteUser(id) {
+    return await User.destroy({
+        where: { id }
+    });
+}
 
 module.exports = {
     readAll,
     readById,
     createUser,
-    createUserPassword,
-    createUserRole,
-    findUserByUsername,
-    findUserByEmail,
     updateUser,
-    findById
+    updateUsername,
+    updateEmail,
+    updatePassword,
+    deleteUser,
 };
