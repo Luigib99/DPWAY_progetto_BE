@@ -1,5 +1,4 @@
 const UserDTO = require('../dto/UserDTO');
-const Users = require('../model/User');
 
 class UserConverter {
     static instance = null;

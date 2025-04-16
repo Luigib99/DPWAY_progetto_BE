@@ -1,5 +1,4 @@
 const RoleDTO = require('../DTO/RoleDTO');
-const Role = require('../model/Role');
 
 class RoleConverter {
     static instance = null;
