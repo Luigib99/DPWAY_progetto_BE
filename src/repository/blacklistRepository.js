@@ -11,7 +11,7 @@ class BlacklistRepository {
         BlacklistRepository.instance = this;
     }
 
-    // INSERISCI IN BLACKLIST
+    // INSERT
     async insert(transaction, userId) {
         const alreadyInBlacklist = await Blacklist.findOne({
             where: { userId },
@@ -40,7 +40,7 @@ class BlacklistRepository {
         return blacklistEntry;
     }
 
-    // RIMUOVI DALLA BLACKLIST
+    // REMOVE
     async remove(userId) {
         const blacklisted = await Blacklist.findOne({ where: { userId } });
         if (!blacklisted) {

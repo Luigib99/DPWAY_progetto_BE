@@ -60,11 +60,6 @@ class UserRepository {
         );
     }
 
-    //UPDATE PASSWORD
-    async updatePassword(id, data) {
-        await User.update(data, { where: { id } });
-    }
-
     //DELETE
     async deleteUser(id) {
         return await User.destroy({

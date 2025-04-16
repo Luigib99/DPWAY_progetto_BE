@@ -11,6 +11,7 @@ class Middleware {
         Middleware.instance = this;
     }
 
+    //VERIFICA ADMIN
     async verifyAdmin(req, res, next) {
         try {
             const executorId = req.params.executorId;

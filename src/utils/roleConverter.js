@@ -10,6 +10,7 @@ class RoleConverter {
         RoleConverter.instance = this;
     }
 
+    //MODEL TO DTO
     modelToDTO(role) {
         if (!role) return null;
         const roleData = role.get();

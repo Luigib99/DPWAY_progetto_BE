@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controller/userController');
 
-// READ ALL
+//READ ALL
 router.get('/readAll', userController.readAll);
 
-// READ BY ID
+//READ BY ID
 router.get('/readUserById/:id', userController.readById);
 
 //CREATE

@@ -10,6 +10,7 @@ class UserConverter {
         UserConverter.instance = this;
     }
 
+    //MODEL TO DTO
     modelToDTO(user) {
         if (!user) return null;
         const userData = user.get();
