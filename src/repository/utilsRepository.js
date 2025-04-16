@@ -1,22 +1,29 @@
 const User = require("../model/User");
 
-//CERCA L'UTENTE DALL'ID
-const findById = async (id) => {
-    return await User.findByPk(id);
-};
+class UserRepository {
+    static instance = null;
 
-//CERCA L'UTENTE DALL'USERNAME
-const findUserByUsername = async (username) => {
-    return await User.findOne({ where: { username } });
-};
+    constructor() {
+        if (UserRepository.instance) {
+            return UserRepository.instance;
+        }
+        UserRepository.instance = this;
+    }
 
-//CERCA L'UTENTE DALLA MAIL
-const findUserByEmail = async (email) => {
-    return await User.findOne({ where: { email } });
-};
+    // CERCA L'UTENTE DALL'ID
+    async findById(id) {
+        return await User.findByPk(id);
+    }
 
-module.exports= {
-    findById,
-    findUserByUsername,
-    findUserByEmail
+    // CERCA L'UTENTE DALL'USERNAME
+    async findUserByUsername(username) {
+        return await User.findOne({ where: { username } });
+    }
+
+    // CERCA L'UTENTE DALLA MAIL
+    async findUserByEmail(email) {
+        return await User.findOne({ where: { email } });
+    }
 }
+
+module.exports = new UserRepository();

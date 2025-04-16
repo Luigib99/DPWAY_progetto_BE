@@ -9,14 +9,15 @@ router.get('/readAll', userController.readAll);
 router.get('/readUserById/:id', userController.readById);
 
 //CREATE
-router.post('/create', userController.createUser);
+router.post('/create/:idRole', userController.createUser);
 
-//UPDATE
-router.put('/update/:id', userController.updateUser);
+//UDPATE
 //username
 router.put('/updateUsername/:id', userController.updateUsername)
+
 //email
 router.put('/updateEmail/:id', userController.updateEmail)
+
 //password
 router.post('/updatePassword/:id', userController.updatePassword)
 

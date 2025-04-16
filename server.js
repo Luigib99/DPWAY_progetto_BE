@@ -6,6 +6,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const database = require('./src/config/database');
 const userRoute = require('./src/route/userRoute');
+const roleRoute = require('./src/route/roleRoute')
+const blacklistRoute = require('./src/route/blacklistRoute')
 
 const app = express();
 
@@ -15,6 +17,8 @@ app.use(express.json());
 
 // ROUTE
 app.use('/users', userRoute);
+app.use('/roles', roleRoute);
+app.use('/blacklist', blacklistRoute);
 
 // SINCRONIZZAZIONE
 database.syncModels();

@@ -1,38 +1,31 @@
-// Importa il DTO e il modello
 const UserDTO = require('../dto/UserDTO');
 const Users = require('../model/User');
 
-const modelToDTO = (user) => {
-    if (!user) return null;
-    const userData = user.get();
+class UserConverter {
+    static instance = null;
 
-    return new UserDTO({
-        id: userData.id,
-        username: userData.username,
-        email: userData.email,
-        passwordExpirationDays: userData.passwordExpirationDays,
-        createdDate: userData.createdDate,
-        lastModifiedDate: userData.lastModifiedDate,
-        active: userData.active,
-        Roles: userData.Roles || [],
-    });
-};
+    constructor() {
+        if (UserConverter.instance) {
+            return UserConverter.instance;
+        }
+        UserConverter.instance = this;
+    }
 
-const DTOToModel = (userDTO) => {
-    if (!userDTO) return null;
+    modelToDTO(user) {
+        if (!user) return null;
+        const userData = user.get();
 
-    return {
-        id: userDTO.id,
-        username: userDTO.username,
-        email: userDTO.email,
-        passwordExpirationDays: userDTO.passwordExpirationDays,
-        createdDate: userDTO.createdDate,
-        lastModifiedDate: userDTO.lastModifiedDate,
-        active: userDTO.active
-    };
-};
+        return new UserDTO({
+            id: userData.id,
+            username: userData.username,
+            email: userData.email,
+            passwordExpirationDays: userData.passwordExpirationDays,
+            createdDate: userData.createdDate,
+            lastModifiedDate: userData.lastModifiedDate,
+            active: userData.active,
+            Roles: userData.Roles || [],
+        });
+    }
+}
 
-module.exports = {
-    modelToDTO,
-    DTOToModel
-};
+module.exports = new UserConverter();

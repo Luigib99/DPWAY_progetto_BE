@@ -1,14 +1,29 @@
 const UserRole = require("../model/UserRole");
+const Role = require("../model/Role");
 
-//CREA RUOLO
-const createUserRole = async (userId, roleId, transaction) => {
-    return await UserRole.create({
-        userId,
-        roleId,
-        createdDate: new Date()
-    }, { transaction });
-};
+class UserRoleService {
+    static instance = null;
 
-module.exports = {
-    createUserRole
+    constructor() {
+        if (UserRoleService.instance) {
+            return UserRoleService.instance;
+        }
+        UserRoleService.instance = this;
+    }
+
+    //READ ALL
+    async readAll() {
+        return await Role.findAll();
+    }
+
+    //CREA RUOLO
+    async createUserRole(userId, roleId, transaction) {
+        return await UserRole.create({
+            userId,
+            roleId,
+            createdDate: new Date()
+        }, { transaction });
+    }
 }
+
+module.exports = new UserRoleService();
